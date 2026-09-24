@@ -1,360 +1,62 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
 
-<title>MUSHIWA KIMPUTU ARTHUR</title>
+  <meta name="viewport"
+        content="width=device-width,
+                 initial-scale=1.0,
+                 maximum-scale=1.0,
+                 user-scalable=no">
 
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800;900&family=Great+Vibes&display=swap');
+  <title>MUSHIWA KIMPUTU ARTHUR</title>
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-body {
-  min-height: 100vh;
-  background:
-    radial-gradient(circle at 50% 20%, #3d2605 0%, #100b02 35%, #000 75%);
-  color: #fff;
-  font-family: 'Cinzel', serif;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow-x: hidden;
-}
+    html,
+    body {
+      width: 100%;
+      min-height: 100%;
+      background: #000;
+    }
 
-/* CADRE PRINCIPAL */
-.container {
-  position: relative;
-  width: 100%;
-  min-height: 100vh;
-  padding: 45px 25px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
+    body {
+      overflow-x: hidden;
+    }
 
-/* GRAND CADRE OR */
-.container::before {
-  content: "";
-  position: absolute;
-  inset: 12px;
-  border: 2px solid #d4a52c;
-  border-radius: 30px;
+    .affiche {
+      width: 100%;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      background: #000;
+    }
 
-  box-shadow:
-    0 0 10px #ffd85a,
-    0 0 30px rgba(255,193,43,.45),
-    inset 0 0 35px rgba(255,193,43,.12);
-}
-
-/* PETITS ORNEMENTS */
-.container::after {
-  content: "✦  ✧  ✦";
-  position: absolute;
-  top: 25px;
-  left: 50%;
-  transform: translateX(-50%);
-
-  color: #ffd75a;
-  font-size: 25px;
-  letter-spacing: 12px;
-
-  text-shadow:
-    0 0 10px #ffd75a,
-    0 0 25px #c48600;
-}
-
-/* CONTENU */
-.content {
-  position: relative;
-  z-index: 2;
-
-  width: min(900px, 100%);
-  text-align: center;
-}
-
-/* COURONNE */
-.crown {
-  font-size: 55px;
-  color: #ffd85a;
-
-  text-shadow:
-    0 0 8px #fff1a6,
-    0 0 20px #d99a18,
-    0 0 40px #9b6500;
-
-  margin-bottom: 10px;
-}
-
-/* NOM */
-.brand {
-  font-size: clamp(25px, 6vw, 58px);
-  font-weight: 900;
-  letter-spacing: 3px;
-
-  background: linear-gradient(
-    180deg,
-    #fff6bd 0%,
-    #ffd75a 25%,
-    #d99916 55%,
-    #fff0a0 75%,
-    #a86c05 100%
-  );
-
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-
-  text-shadow:
-    0 0 12px rgba(255,200,50,.5);
-}
-
-/* LIGNE */
-.line {
-  width: 75%;
-  height: 3px;
-  margin: 20px auto 35px;
-
-  background: linear-gradient(
-    90deg,
-    transparent,
-    #ffe999,
-    #d69b1c,
-    #fff0a3,
-    transparent
-  );
-
-  box-shadow: 0 0 15px #e5af32;
-}
-
-/* CHER CLIENT */
-.title {
-  font-family: 'Great Vibes', cursive;
-  font-size: clamp(55px, 12vw, 115px);
-
-  background: linear-gradient(
-    180deg,
-    #fff5ae,
-    #ffd348 35%,
-    #c98308 70%,
-    #fff0a1
-  );
-
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-
-  text-shadow:
-    0 0 8px #ffd85a,
-    0 0 25px rgba(255,190,30,.55),
-    3px 4px 0 #6d4300;
-}
-
-/* MESSAGE */
-.message-box {
-  margin: 20px auto;
-  padding: 35px 25px;
-
-  border: 2px solid #d9a72c;
-  border-radius: 25px;
-
-  background:
-    linear-gradient(
-      145deg,
-      rgba(255,196,45,.13),
-      rgba(0,0,0,.85),
-      rgba(255,196,45,.08)
-    );
-
-  box-shadow:
-    0 0 20px rgba(230,165,30,.4),
-    inset 0 0 30px rgba(255,190,40,.08);
-}
-
-/* TEXTE */
-.message {
-  font-size: clamp(22px, 4vw, 42px);
-  line-height: 1.45;
-  font-weight: 700;
-
-  color: #fff8df;
-
-  text-shadow:
-    0 2px 3px #000,
-    0 0 10px rgba(255,214,90,.3);
-}
-
-/* NOM APPLICATION */
-.application {
-  display: inline-block;
-
-  margin-top: 22px;
-  padding: 13px 25px;
-
-  font-size: clamp(20px, 4vw, 38px);
-  font-weight: 900;
-  letter-spacing: 1px;
-
-  color: #160d00;
-
-  background:
-    linear-gradient(
-      180deg,
-      #fff1a0,
-      #f0bd3e 35%,
-      #b97608 70%,
-      #ffe57b
-    );
-
-  border: 2px solid #ffe999;
-  border-radius: 12px;
-
-  box-shadow:
-    0 0 12px #e7b12f,
-    inset 0 2px 5px rgba(255,255,255,.7);
-}
-
-/* CONTACT */
-.contact {
-  margin-top: 35px;
-
-  padding: 25px 20px;
-
-  border-top: 2px solid #dca82e;
-  border-bottom: 2px solid #dca82e;
-
-  background: rgba(0,0,0,.45);
-}
-
-.contact-text {
-  font-size: clamp(18px, 3.5vw, 30px);
-  font-weight: 600;
-  line-height: 1.5;
-  color: #fff7d6;
-}
-
-.whatsapp {
-  display: inline-block;
-  margin-top: 15px;
-
-  padding: 13px 30px;
-
-  border-radius: 50px;
-
-  background: linear-gradient(
-    180deg,
-    #fff1a1,
-    #d99b19,
-    #a96a00
-  );
-
-  border: 2px solid #ffe999;
-
-  color: #100a00;
-
-  font-size: clamp(21px, 4vw, 36px);
-  font-weight: 900;
-  letter-spacing: 1px;
-
-  box-shadow:
-    0 0 15px rgba(255,201,50,.65),
-    inset 0 2px 5px rgba(255,255,255,.65);
-}
-
-/* ÉTOILES */
-.stars {
-  margin-top: 25px;
-  color: #ffd75a;
-  font-size: 25px;
-  letter-spacing: 15px;
-
-  text-shadow:
-    0 0 10px #ffd75a,
-    0 0 25px #b87800;
-}
-
-/* MOBILE */
-@media (max-width: 600px) {
-
-  .container {
-    padding: 55px 18px 35px;
-  }
-
-  .container::before {
-    inset: 7px;
-    border-radius: 20px;
-  }
-
-  .message-box {
-    padding: 28px 15px;
-  }
-
-  .message {
-    font-size: 21px;
-  }
-
-  .application {
-    font-size: 20px;
-  }
-}
-</style>
+    .affiche img {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      height: auto;
+      margin: 0;
+      padding: 0;
+    }
+  </style>
 </head>
 
 <body>
 
-<div class="container">
-
-  <main class="content">
-
-    <div class="crown">♛</div>
-
-    <div class="brand">
-      MUSHIWA KIMPUTU ARTHUR
-    </div>
-
-    <div class="line"></div>
-
-    <div class="title">
-      Cher Client
-    </div>
-
-    <div class="message-box">
-
-      <div class="message">
-        Vous n'avez plus la cérémonie
-        pour le moment sur notre application
-      </div>
-
-      <div class="application">
-        MUSHIWA KIMPUTU ARTHUR
-      </div>
-
-    </div>
-
-    <div class="contact">
-
-      <div class="contact-text">
-        En cas de besoin, contactez-nous sur WhatsApp
-      </div>
-
-      <div class="whatsapp">
-        ☎ &nbsp; +243 962 062 828
-      </div>
-
-    </div>
-
-    <div class="stars">
-      ✦ ✧ ✦
-    </div>
-
-  </main>
-
-</div>
+  <div class="affiche">
+    <img
+      src="mka.png"
+      alt="MUSHIWA KIMPUTU ARTHUR"
+    >
+  </div>
 
 </body>
-  </html>
+</html>
