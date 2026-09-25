@@ -6,362 +6,271 @@
 
 <title>MUSHIWA KIMPUTU ARTHUR</title>
 
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Playfair+Display:ital,wght@1,500;1,600&display=swap');
+<!-- Scanner QR -->
+<script src="https://unpkg.com/html5-qrcode"></script>
 
+<style>
 *{
+    box-sizing:border-box;
     margin:0;
     padding:0;
-    box-sizing:border-box;
 }
 
 body{
-    min-height:100vh;
-    background:#050505;
-    color:#fff;
-    font-family:"Cinzel",serif;
-    overflow-x:hidden;
-}
-
-/* FOND LUXUEUX */
-body::before{
-    content:"";
-    position:fixed;
-    inset:0;
-    pointer-events:none;
     background:
-        radial-gradient(circle at 50% 20%,rgba(218,164,42,.18),transparent 30%),
-        radial-gradient(circle at 10% 90%,rgba(218,164,42,.10),transparent 25%),
-        radial-gradient(circle at 90% 70%,rgba(218,164,42,.10),transparent 25%);
-}
-
-/* PAGE */
-.page{
+        radial-gradient(circle at top,#3a2a00 0%,#080808 35%,#000 100%);
+    color:white;
+    font-family:Georgia,serif;
     min-height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    padding:30px 15px;
 }
 
-/* CARTE */
-.card{
-    position:relative;
-    width:min(850px,100%);
-    padding:55px 35px 45px;
+.container{
+    width:100%;
+    max-width:1100px;
+    margin:auto;
+    padding:20px;
+}
+
+/* HEADER */
+header{
     text-align:center;
-
-    background:
-        linear-gradient(
-            145deg,
-            #17130a,
-            #050505 35%,
-            #161108 70%,
-            #030303
-        );
-
-    border:1px solid #b88721;
-
-    box-shadow:
-        0 0 0 5px #090909,
-        0 0 0 7px #6d4a0e,
-        0 0 35px rgba(216,165,45,.25),
-        inset 0 0 50px rgba(216,165,45,.08);
-
-    overflow:hidden;
+    padding:25px 10px;
+    border-bottom:1px solid #d4af37;
 }
 
-/* LIGNES DÉCORATIVES */
-.card::before,
-.card::after{
-    content:"";
-    position:absolute;
-    width:170px;
-    height:170px;
-    border:1px solid rgba(221,177,65,.6);
-    transform:rotate(45deg);
-}
-
-.card::before{
-    top:-125px;
-    left:-125px;
-}
-
-.card::after{
-    bottom:-125px;
-    right:-125px;
-}
-
-/* PETITS DIAMANTS */
-.diamond{
-    color:#ffe8a0;
-    font-size:22px;
-    text-shadow:
-        0 0 5px white,
-        0 0 15px #d9a52d;
-}
-
-/* LOGO */
 .logo{
-    width:105px;
-    height:105px;
-    margin:0 auto 18px;
-
+    width:75px;
+    height:75px;
+    margin:auto;
+    border-radius:50%;
     display:flex;
     align-items:center;
     justify-content:center;
-
-    border-radius:50%;
-
-    border:2px solid #e0b53f;
-
-    background:
-        radial-gradient(circle,#392709,#080704 70%);
-
+    font-size:25px;
+    font-weight:bold;
+    color:#000;
+    background:linear-gradient(145deg,#fff4a8,#d4af37,#fff0a0);
     box-shadow:
-        0 0 12px rgba(255,209,80,.6),
-        inset 0 0 20px rgba(255,207,80,.15);
+        0 0 15px #d4af37,
+        inset 0 0 10px white;
 }
 
-.logo span{
-    font-size:31px;
-    font-weight:800;
-
-    background:
-        linear-gradient(
-            180deg,
-            #fff2a7,
-            #d79c20,
-            #fff0a0
-        );
-
-    -webkit-background-clip:text;
-    background-clip:text;
-    color:transparent;
-}
-
-/* NOM */
-.brand{
-    font-size:clamp(23px,5vw,48px);
-    font-weight:800;
+h1{
+    margin-top:15px;
+    font-size:25px;
     letter-spacing:2px;
-
-    background:
-        linear-gradient(
-            180deg,
-            #fff3b0,
-            #e4ae32 45%,
-            #a96d09 70%,
-            #ffe990
-        );
-
-    -webkit-background-clip:text;
-    background-clip:text;
-    color:transparent;
-
-    text-shadow:0 0 20px rgba(232,180,55,.25);
+    color:#f5d76e;
 }
 
-/* LIGNE */
-.line{
-    display:flex;
-    align-items:center;
-    gap:15px;
-    margin:22px auto 35px;
-    width:80%;
+.subtitle{
+    margin-top:8px;
+    color:#ddd;
+    font-size:14px;
 }
 
-.line::before,
-.line::after{
-    content:"";
-    height:1px;
-    flex:1;
-    background:linear-gradient(
-        90deg,
-        transparent,
-        #d6a22b
-    );
+/* MESSAGE */
+.message{
+    margin:25px auto;
+    max-width:750px;
+    padding:25px;
+    text-align:center;
+    border:1px solid #d4af37;
+    border-radius:20px;
+    background:linear-gradient(145deg,#171717,#050505);
+    box-shadow:0 0 25px rgba(212,175,55,.25);
 }
 
-.line::after{
-    background:linear-gradient(
-        90deg,
-        #d6a22b,
-        transparent
-    );
+.message h2{
+    color:#f5d76e;
+    margin-bottom:12px;
+}
+
+.message p{
+    line-height:1.7;
+    color:#eee;
+}
+
+/* SCANNER */
+.scanner-box{
+    margin:25px auto;
+    max-width:500px;
+    text-align:center;
+    padding:20px;
+    border:1px solid #d4af37;
+    border-radius:20px;
+    background:#080808;
+}
+
+.scanner-box h2{
+    color:#f5d76e;
+    margin-bottom:10px;
+}
+
+.scanner-box p{
+    color:#bbb;
+    font-size:14px;
+    margin-bottom:15px;
+}
+
+#reader{
+    width:100%;
+    max-width:400px;
+    margin:auto;
+    overflow:hidden;
+    border-radius:15px;
+}
+
+.scan-button{
+    margin-top:15px;
+    padding:13px 25px;
+    border:0;
+    border-radius:30px;
+    background:linear-gradient(135deg,#fff2a0,#d4af37);
+    color:#000;
+    font-weight:bold;
+    cursor:pointer;
+    font-size:15px;
 }
 
 /* TITRE */
-.title{
-    font-family:"Playfair Display",serif;
-    font-style:italic;
-
-    font-size:clamp(55px,12vw,105px);
-
-    background:
-        linear-gradient(
-            180deg,
-            #fff9cf 0%,
-            #ffd85a 30%,
-            #c7890e 65%,
-            #fff0a1 100%
-        );
-
-    -webkit-background-clip:text;
-    background-clip:text;
-    color:transparent;
-
-    filter:
-        drop-shadow(0 2px 2px #000)
-        drop-shadow(0 0 12px rgba(255,202,60,.4));
-
-    margin-bottom:20px;
+.section-title{
+    text-align:center;
+    margin:35px 0 20px;
+    color:#f5d76e;
+    font-size:23px;
 }
 
-/* TEXTE */
-.text{
-    max-width:680px;
-    margin:auto;
-
-    font-family:"Playfair Display",serif;
-    font-size:clamp(22px,4vw,37px);
-    line-height:1.5;
-
-    color:#f9f1d7;
+/* CARTES */
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+    gap:18px;
 }
 
-/* NOM APPLICATION */
-.app{
-    display:inline-block;
-    margin-top:28px;
-    padding:13px 24px;
-
-    border-top:1px solid #f3d16c;
-    border-bottom:1px solid #b67d11;
-
-    color:#ffd967;
-
-    font-size:clamp(19px,3.5vw,31px);
-    font-weight:800;
-    letter-spacing:1px;
-
-    text-shadow:0 0 10px rgba(255,201,65,.35);
+.card{
+    overflow:hidden;
+    border:1px solid #9f7c15;
+    border-radius:18px;
+    background:linear-gradient(145deg,#181818,#050505);
+    box-shadow:0 5px 20px rgba(212,175,55,.15);
+    transition:.3s;
 }
 
-/* SEPARATEUR */
-.separator{
-    margin:35px auto 25px;
-    width:70%;
-    height:1px;
-
-    background:
-        linear-gradient(
-            90deg,
-            transparent,
-            #dca62e,
-            transparent
-        );
+.card:hover{
+    transform:translateY(-5px);
+    box-shadow:0 0 25px rgba(212,175,55,.35);
 }
 
-/* CONTACT */
-.contact-label{
-    color:#cdb77b;
-    font-size:clamp(15px,2.5vw,21px);
-    letter-spacing:1px;
+.card img{
+    width:100%;
+    height:190px;
+    object-fit:cover;
+    display:block;
+}
+
+.card-content{
+    padding:15px;
+    text-align:center;
+}
+
+.card h3{
+    color:#f5d76e;
+    font-size:18px;
+    margin-bottom:8px;
+}
+
+.card p{
+    color:#bbb;
+    font-size:13px;
+    margin-bottom:12px;
+}
+
+.choose{
+    width:100%;
+    padding:11px;
+    border:1px solid #d4af37;
+    border-radius:25px;
+    background:transparent;
+    color:#f5d76e;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.choose:hover{
+    background:#d4af37;
+    color:#000;
 }
 
 /* WHATSAPP */
 .whatsapp{
-    display:inline-flex;
-    align-items:center;
-    gap:13px;
-
-    margin-top:15px;
-    padding:12px 25px;
-
-    border:1px solid #d9aa35;
-    border-radius:40px;
-
-    background:
-        linear-gradient(
-            135deg,
-            #2a210e,
-            #0b0a06
-        );
-
-    color:#f9d86b;
-
-    font-size:clamp(20px,4vw,32px);
-    font-weight:700;
-
-    box-shadow:
-        0 0 15px rgba(218,165,45,.2);
+    display:block;
+    width:max-content;
+    margin:35px auto 20px;
+    padding:14px 25px;
+    border-radius:30px;
+    background:#20c76a;
+    color:white;
+    text-decoration:none;
+    font-weight:bold;
+    box-shadow:0 0 18px rgba(32,199,106,.35);
 }
 
-/* LOGO WHATSAPP */
-.whatsapp-icon{
-    width:40px;
-    height:40px;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    border-radius:50%;
-    background:#25D366;
+.whatsapp:hover{
+    transform:scale(1.03);
 }
 
-.whatsapp-icon svg{
-    width:26px;
-    height:26px;
-    fill:white;
-}
-
-/* BAS */
-.footer{
+/* FOOTER */
+footer{
+    text-align:center;
+    padding:25px 10px;
     margin-top:30px;
-    color:#806728;
+    border-top:1px solid #604c12;
+    color:#888;
     font-size:13px;
-    letter-spacing:4px;
+}
+
+.gold{
+    color:#d4af37;
 }
 
 /* MOBILE */
 @media(max-width:600px){
-
-    .page{
-        padding:18px 10px;
+    .container{
+        padding:12px;
     }
 
-    .card{
-        padding:40px 20px 35px;
+    h1{
+        font-size:20px;
     }
 
-    .logo{
-        width:85px;
-        height:85px;
+    .message{
+        padding:18px;
     }
 
-    .logo span{
-        font-size:26px;
+    .grid{
+        grid-template-columns:repeat(2,1fr);
+        gap:10px;
     }
 
-    .text{
-        font-size:21px;
+    .card img{
+        height:130px;
     }
 
-    .app{
-        font-size:19px;
-        padding:11px 14px;
+    .card-content{
+        padding:10px;
     }
 
-    .whatsapp{
-        font-size:18px;
-        padding:10px 16px;
+    .card h3{
+        font-size:14px;
     }
 
-    .whatsapp-icon{
-        width:35px;
-        height:35px;
+    .card p{
+        font-size:11px;
+    }
+
+    .choose{
+        font-size:11px;
+        padding:9px 5px;
     }
 }
 </style>
@@ -369,103 +278,306 @@ body::before{
 
 <body>
 
-<div class="page">
+<div class="container">
 
+<header>
+
+<div class="logo">MKA</div>
+
+<h1>MUSHIWA KIMPUTU ARTHUR</h1>
+
+<p class="subtitle">
+Cérémonies • Invitations • Événements
+</p>
+
+</header>
+
+
+<section class="message">
+
+<h2>✨ Cher Client ✨</h2>
+
+<p>
+Bienvenue sur notre application
+<strong class="gold">MUSHIWA KIMPUTU ARTHUR</strong>.
+</p>
+
+<p>
+Découvrez nos différents modèles de cérémonies
+et choisissez celui qui vous convient.
+</p>
+
+</section>
+
+
+<!-- SCANNER QR -->
+
+<section class="scanner-box">
+
+<h2>📱 Scanner un QR Code</h2>
+
+<p>
+Utilisez l'appareil photo de votre téléphone
+pour scanner votre code QR.
+</p>
+
+<div id="reader"></div>
+
+<button class="scan-button" onclick="startScanner()">
+📷 Ouvrir la caméra
+</button>
+
+</section>
+
+
+<h2 class="section-title">
+💎 Nos choix de cérémonies 💎
+</h2>
+
+
+<div class="grid">
+
+<!-- 1 -->
+<div class="card">
+<img src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80">
+<div class="card-content">
+<h3>Mariage Royal</h3>
+<p>Invitation élégante</p>
+<button class="choose" onclick="choisir(1)">CHOISIR</button>
+</div>
+</div>
+
+<!-- 2 -->
+<div class="card">
+<img src="https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?auto=format&fit=crop&w=800&q=80">
+<div class="card-content">
+<h3>Mariage Élégant</h3>
+<p>Cérémonie prestigieuse</p>
+<button class="choose" onclick="choisir(2)">CHOISIR</button>
+</div>
+</div>
+
+<!-- 3 -->
+<div class="card">
+<img src="https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=800&q=80">
+<div class="card-content">
+<h3>Mariage Luxe</h3>
+<p>Style moderne</p>
+<button class="choose" onclick="choisir(3)">CHOISIR</button>
+</div>
+</div>
+
+<!-- 4 -->
+<div class="card">
+<img src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=800&q=80">
+<div class="card-content">
+<h3>Cérémonie Chic</h3>
+<p>Invitation premium</p>
+<button class="choose" onclick="choisir(4)">CHOISIR</button>
+</div>
+</div>
+
+<!-- 5 -->
+<div class="card">
+<img src="https://images.unsplash.com/photo-1544078751-58fee2d8a03b?auto=format&fit=crop&w=800&q=80">
+<div class="card-content">
+<h3>Cérémonie Or</h3>
+<p>Design doré</p>
+<button class="choose" onclick="choisir(5)">CHOISIR</button>
+</div>
+</div>
+
+<!-- 6 -->
+<div class="card">
+<img src="https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=800&q=80">
+<div class="card-content">
+<h3>Grande Cérémonie</h3>
+<p>Style majestueux</p>
+<button class="choose" onclick="choisir(6)">CHOISIR</button>
+</div>
+</div>
+
+<!-- 7 -->
+<div class="card">
+<img src="https://images.unsplash.com/photo-1519225468359-299651c3f3e0?auto=format&fit=crop&w=800&q=80">
+<div class="card-content">
+<h3>Événement Diamant</h3>
+<p>Style luxueux</p>
+<button class="choose" onclick="choisir(7)">CHOISIR</button>
+</div>
+</div>
+
+<!-- 8 -->
+<div class="card">
+<img src="https://images.unsplash.com/photo-1507504031003-b417219a0fde?auto=format&fit=crop&w=800&q=80">
+<div class="card-content">
+<h3>Invitation Prestige</h3>
+<p>Design classique</p>
+<button class="choose" onclick="choisir(8)">CHOISIR</button>
+</div>
+</div>
+
+<!-- 9 -->
+<div class="card">
+<img src="https://images.unsplash.com/photo-1507504031003-b417219a0fde?auto=format&fit=crop&w=800&q=80">
+<div class="card-content">
+<h3>Royal Gold</h3>
+<p>Collection premium</p>
+<button class="choose" onclick="choisir(9)">CHOISIR</button>
+</div>
+</div>
+
+<!-- 10 -->
+<div class="card">
+<img src="https://images.unsplash.com/photo-1478146896981-b80fe463b330?auto=format&fit=crop&w=800&q=80">
+<div class="card-content">
+<h3>Classic Wedding</h3>
+<p>Style romantique</p>
+<button class="choose" onclick="choisir(10)">CHOISIR</button>
+</div>
+</div>
+
+<!-- 11 à 23 générés automatiquement -->
+
+<script>
+
+const images = [
+"https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?auto=format&fit=crop&w=800&q=80",
+"https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=800&q=80",
+"https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80",
+"https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=800&q=80"
+];
+
+const noms = [
+"Cérémonie Élégance",
+"Mariage Prestige",
+"Collection Royale",
+"Invitation Diamant",
+"Grande Fête",
+"Wedding Premium",
+"Cérémonie Majesté",
+"Golden Invitation",
+"Luxury Wedding",
+"Royal Ceremony",
+"Premium Event",
+"Diamond Event",
+"Grand Mariage"
+];
+
+for(let i=11;i<=23;i++){
+
+    const image = images[(i-11)%images.length];
+    const nom = noms[(i-11)%noms.length];
+
+    document.write(`
     <div class="card">
-
-        <div class="diamond">
-            ◆
+        <img src="${image}">
+        <div class="card-content">
+            <h3>${nom}</h3>
+            <p>Modèle N°${i}</p>
+            <button class="choose" onclick="choisir(${i})">
+                CHOISIR
+            </button>
         </div>
-
-        <div class="logo">
-            <span>MKA</span>
-        </div>
-
-        <div class="brand">
-            MUSHIWA KIMPUTU ARTHUR
-        </div>
-
-        <div class="line"></div>
-
-        <div class="title">
-            Cher Client
-        </div>
-
-        <div class="text">
-            Pour le moment, vous n’avez aucune
-            cérémonie disponible sur notre
-            application
-        </div>
-
-        <div class="app">
-            MUSHIWA KIMPUTU ARTHUR
-        </div>
-
-        <div class="separator"></div>
-
-        <div class="contact-label">
-            Pour toute information, veuillez nous contacter
-        </div>
-
-        <div class="whatsapp">
-
-            <div class="whatsapp-icon">
-
-                <svg viewBox="0 0 32 32">
-                    <path d="
-                    M16 3
-                    C8.82 3 3 8.82 3 16
-                    C3 18.3 3.6 20.55 4.74 22.53
-                    L3 29
-                    L9.68 27.3
-                    C11.6 28.42 13.78 29 16 29
-                    C23.18 29 29 23.18 29 16
-                    C29 8.82 23.18 3 16 3Z
-
-                    M16 26.5
-                    C10.21 26.5 5.5 21.79 5.5 16
-                    C5.5 10.21 10.21 5.5 16 5.5
-                    C21.79 5.5 26.5 10.21 26.5 16
-                    C26.5 21.79 21.79 26.5 16 26.5Z
-
-                    M21.86 18.71
-                    C21.55 18.55 19.99 17.78 19.7 17.67
-                    C19.41 17.56 19.2 17.51 18.99 17.83
-                    C18.78 18.15 18.17 18.87 17.98 19.08
-                    C17.8 19.29 17.61 19.32 17.29 19.16
-                    C16.97 19 15.95 18.63 14.74 17.55
-                    C13.8 16.71 13.17 15.68 12.99 15.36
-                    C12.81 15.04 12.97 14.86 13.13 14.7
-                    C13.28 14.55 13.45 14.33 13.61 14.15
-                    C13.77 13.97 13.82 13.84 13.93 13.63
-                    C14.04 13.42 13.98 13.24 13.9 13.08
-                    C13.82 12.92 13.19 11.36 12.93 10.73
-                    C12.67 10.11 12.41 10.19 12.22 10.18
-                    L11.62 10.18
-                    C11.41 10.18 11.07 10.26 10.78 10.58
-                    C10.49 10.9 9.68 11.65 9.68 13.19
-                    C9.68 14.73 10.81 16.22 10.97 16.43
-                    C11.13 16.64 13.2 19.82 16.36 21.19
-                    C17.11 21.51 17.7 21.71 18.16 21.86
-                    C18.92 22.1 19.61 22.07 20.16 21.99
-                    C20.77 21.9 22.04 21.22 22.3 20.48
-                    C22.56 19.74 22.56 19.1 22.48 18.97
-                    C22.4 18.84 22.17 18.78 21.86 18.71Z"/>
-                </svg>
-
-            </div>
-
-            +243 962 062 828
-
-        </div>
-
-        <div class="footer">
-            ✦ MKA ✦
-        </div>
-
     </div>
+    `);
+}
+
+</script>
 
 </div>
 
+
+<a
+class="whatsapp"
+href="https://wa.me/243962062828?text=Bonjour%20MUSHIWA%20KIMPUTU%20ARTHUR%2C%20je%20voudrais%20choisir%20une%20c%C3%A9r%C3%A9monie."
+target="_blank">
+
+💬 WhatsApp : +243 962 062 828
+
+</a>
+
+
+<footer>
+
+© 2026 <span class="gold">MUSHIWA KIMPUTU ARTHUR</span><br>
+Tous droits réservés.
+
+</footer>
+
+</div>
+
+
+<script>
+
+/* CHOIX D'UNE CEREMONIE */
+
+function choisir(numero){
+
+    const message =
+    "Bonjour MUSHIWA KIMPUTU ARTHUR, je choisis la cérémonie N°"
+    + numero
+    + ". Je voudrais avoir plus d'informations.";
+
+    const lien =
+    "https://wa.me/243962062828?text="
+    + encodeURIComponent(message);
+
+    window.open(lien,"_blank");
+}
+
+
+/* SCANNER QR */
+
+let scanner;
+
+function startScanner(){
+
+    if(scanner){
+        return;
+    }
+
+    scanner = new Html5Qrcode("reader");
+
+    scanner.start(
+        {facingMode:"environment"},
+        {
+            fps:10,
+            qrbox:{
+                width:250,
+                height:250
+            }
+        },
+
+        function(decodedText){
+
+            alert(
+                "QR Code détecté !\n\n"
+                + decodedText
+            );
+
+            scanner.stop();
+
+            window.location.href = decodedText;
+
+        },
+
+        function(errorMessage){
+            // Recherche du QR en cours
+        }
+
+    ).catch(function(error){
+
+        alert(
+            "Impossible d'ouvrir la caméra. " +
+            "Vérifiez que votre navigateur a autorisé " +
+            "l'accès à la caméra."
+        );
+
+    });
+}
+
+</script>
+
 </body>
-  </html>
+    </html>
