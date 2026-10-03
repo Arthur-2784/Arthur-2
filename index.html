@@ -41,8 +41,15 @@ button{padding:10px 12px;border-radius:12px;border:0;font-weight:800;cursor:poin
 </div></div></div>
 <div id="app" style="display:none"><div class="tabs"><button type="button" onclick="pg('cer')" class="gold">CÉRÉMONIES</button><button type="button" onclick="pg('scan')" style="background:#1a1800;color:#FFD700;border:1px solid rgba(255,215,0,0.12)">🔫 SCANNER</button><button type="button" onclick="pg('hotspot')" style="background:#0a140a;color:#00ff88;border:1px solid #00ff88">📶 HOTSPOT</button><button type="button" onclick="pg('rapport')" style="background:#1a1800;color:#FFD700;border:2px solid #FFD700">📊 RAPPORT</button></div>
 <div id="p-cer"></div><div id="p-scan" style="display:none"></div><div id="p-hotspot" style="display:none"></div><div id="p-rapport" style="display:none"></div></div>
-<div id="qrModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:50;align-items:center;justify-content:center;padding:20px"><div style="background:#111;border:2px solid #FFD700;border-radius:16px;padding:16px;text-align:center;max-width:320px;width:100%"><div id="qrcode" style="background:#fff;padding:10px;border-radius:10px;display:inline-block"></div><p id="qrText" style="margin-top:10px;font-size:11px"></p><div style="display:flex;gap:6px;margin-top:10px"><button type="button" onclick="shareQR()" class="green" style="flex:1">📤 PARTAGER QR</button><button type="button" onclick="closeQR()" style="flex:1;background:#222;color:#FFD700">FERMER</button></div></div></div>
-<script>
+<div id="qrModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:99999;align-items:flex-end;justify-content:center" onclick="if(event.target.id==='qrModal') closeQR()">
+  <div style="background:#111;border-top:3px solid #FFD700;border-radius:24px 24px 0 0;width:100%;max-width:420px;padding:20px;text-align:center">
+    <div id="qrcode" style="background:#fff;padding:14px;border-radius:16px;display:inline-block"></div>
+    <p id="qrName" style="color:#fff;font-weight:800;margin-top:10px;font-size:14px"></p>
+    <p id="qrText" style="background:#000;border:1px dashed #FFD700;color:#FFD700;padding:10px;border-radius:10px;margin-top:8px;font-weight:900"></p>
+    <div style="display:flex;gap:8px;margin-top:14px"><button type="button" onclick="shareQR()" class="green" style="flex:1;padding:14px">📤 PARTAGER QR</button><button type="button" onclick="closeQR()" style="flex:1;background:#222;color:#FFD700;padding:14px;border-radius:12px">FERMER</button></div>
+  </div>
+  </div>
+  <script>
 const PATRON="GOMA-MK-9Y3K";const ACCES="BUKAVU2026M";
 let role="";let cur=null;let currentCode="";let myCerId=null;let scannerMode="MANUEL";let lastQRCode="";let html5QrCode=null;let camRunning=false;let lastScannedCode="";
 let cers=[];let black=[];let hotspotMulti={};let masterStatus={};let deletedCodes=[];let lastEntries=[];
@@ -54,7 +61,6 @@ try{
   deletedCodes=JSON.parse(localStorage.getItem('g59_DELETED_CODES')||'[]');
   lastEntries=JSON.parse(localStorage.getItem('g59_LAST')||'[]');
 }catch(e){}
-function log(m){let el=document.getElementById('status'); if(el) el.innerHTML=m;}
 function genCerCode(){const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let s='GOMA-CER-';for(let i=0;i<4;i++)s+=c[Math.floor(Math.random()*c.length)];return s;}
 function genAssocCode(n){const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let s='HOTSPOT-A'+n+'-';for(let i=0;i<4;i++)s+=c[Math.floor(Math.random()*c.length)];return s;}
 function save(){try{localStorage.setItem('g59_CERS',JSON.stringify(cers));localStorage.setItem('g59_BLACK',JSON.stringify(black));localStorage.setItem('g59_HOTSPOT_MULTI',JSON.stringify(hotspotMulti));localStorage.setItem('g59_MASTER_STATUS',JSON.stringify(masterStatus));localStorage.setItem('g59_DELETED_CODES',JSON.stringify(deletedCodes));localStorage.setItem('g59_LAST',JSON.stringify(lastEntries));}catch(e){}}
@@ -67,29 +73,77 @@ function loginOwner(){let cc=document.getElementById('cc').value.trim().toUpperC
 function loginHotspot(){let ch=document.getElementById('ch').value.trim().toUpperCase();for(let id in hotspotMulti){for(let code in hotspotMulti[id]){if(code===ch){let found=cers.find(c=>c.id===id);if(!found){showError('Importe fichier!');return;}role="AGENT_HOTSPOT";currentCode=ch;myCerId=id;document.getElementById('presentation').style.display='none';document.getElementById('app').style.display='block';pg('cer');renderCer();openCer(cers.findIndex(c=>c.id===myCerId));return;}}}showError('Code associé pas trouvé!');}
 function pg(n){['cer','scan','hotspot','rapport'].forEach(k=>{let el=document.getElementById('p-'+k);if(el)el.style.display=k===n?'block':'none';});if(n==='rapport')renderRap();if(n==='scan')renderScan();if(n==='hotspot')renderHotspot();if(n!=='scan')stopCam();}
 function renderCer(){
-  if(role==='OWNER'||role==='AGENT_HOTSPOT'){let list=cers.filter(c=>c.id===myCerId);let h=``;list.forEach((c)=>{let idx=cers.findIndex(x=>x.id===c.id);h+=`<div class="card"><b>${c.name}</b> - ${c.cerCode}<br><button type="button" onclick="openCer(${idx})" class="green" style="width:100%">📂 OUVRIR V61.1</button></div>`;});document.getElementById('p-cer').innerHTML=h;return;}
-  let h=`<div class="card"><b>👑 PATRON V61.1 AVEC PHOTO</b><div style="display:grid;grid-template-columns:1fr 1fr;gap:4px"><input id="cn" placeholder="Nom Mariage"><input id="cl" placeholder="Lieu"><input id="ca2" placeholder="Adresse"><input id="cd" type="date"><input id="cm" placeholder="Mot perso"><input id="ct" placeholder="Tel"></div><button type="button" onclick="createCerBrouillon()" class="gold" style="width:100%">📝 CRÉER</button></div>`;
-  cers.forEach((c,i)=>{let total=c.guests.reduce((s,g)=>s+g.persons.length,0);h+=`<div class="card"><b>${c.name}</b> ${c.cerCode} - ${total} pers<div style="display:flex;gap:4px"><button type="button" onclick="openCer(${i})" class="gold">OUVRIR</button><button type="button" onclick="exportCer(${i})" style="background:#111;color:#FFD700">📤 FICHIER</button><button type="button" onclick="delCer(${i})" class="red">SUPPR</button></div></div>`;});
+  if(role==='OWNER'||role==='AGENT_HOTSPOT'){
+    let list=cers.filter(c=>c.id===myCerId);
+    let h=``;
+    list.forEach((c)=>{
+      let idx=cers.findIndex(x=>x.id===c.id);
+      let total=c.guests.reduce((s,g)=>s+g.persons.length,0);
+      let entres=c.guests.reduce((s,g)=>s+g.persons.filter(p=>black.includes(p.id)||p.entre).length,0);
+      h+=`<div class="card" style="border:2px solid #00ff88"><b>🎉 ${c.name}</b> - ${c.cerCode} - ${total} invités (${entres} entrés)<br>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px">
+        <button type="button" onclick="openCer(${idx})" class="green" style="padding:14px">📂 OUVRIR</button>
+        <button type="button" onclick="pg('hotspot')" style="background:#0a140a;color:#00ff88;border:2px solid #00ff88;padding:14px">📶 HOTSPOT</button>
+      </div>
+      <button type="button" onclick="exportCer(${idx})" style="width:100%;background:#FFD700;color:#000;margin-top:6px;padding:14px">📤 EXPORTER FICHIER AVEC ACTIVITÉS</button>
+      <p class="small" style="color:#00ff88;margin-top:4px">Ce fichier contient déjà tes ${entres} entrées + heures, importable par hotspot</p>
+      </div>`;
+    });
+    document.getElementById('p-cer').innerHTML=h;return;
+  }
+  let h=`<div class="card"><b>👑 PATRON V61.1</b><div style="display:grid;grid-template-columns:1fr 1fr;gap:4px"><input id="cn" placeholder="Nom Mariage"><input id="cl" placeholder="Lieu"><input id="ca2" placeholder="Adresse"><input id="cd" type="date"><input id="cm" placeholder="Mot perso"><input id="ct" placeholder="Tel"></div><button type="button" onclick="createCerBrouillon()" class="gold" style="width:100%">📝 CRÉER</button></div>`;
+  cers.forEach((c,i)=>{let total=c.guests.reduce((s,g)=>s+g.persons.length,0);h+=`<div class="card"><b>${c.name}</b> ${c.cerCode} - ${total} pers<div style="display:flex;gap:4px;flex-wrap:wrap"><button type="button" onclick="openCer(${i})" class="gold">OUVRIR</button><button type="button" onclick="exportCer(${i})" style="background:#111;color:#FFD700">📤 FICHIER</button><button type="button" onclick="delCer(${i})" class="red">SUPPR</button></div></div>`;});
   document.getElementById('p-cer').innerHTML=h;
 }
 function createCerBrouillon(){let n=document.getElementById('cn').value.trim();if(!n)return;let id='cer_'+Date.now();let cer={id:id,cerCode:null,version:0,oldCodes:[],name:n,lieu:document.getElementById('cl').value.trim(),adresse:document.getElementById('ca2').value.trim(),date:document.getElementById('cd').value,motPerso:document.getElementById('cm').value.trim(),tel:document.getElementById('ct').value.trim(),guests:[]};cers.push(cer);save();renderCer();}
 function openCer(i){cur=cers[i];myCerId=cur.id;save();document.getElementById('topActivity').innerHTML='✅ V61.1 AVEC PHOTO - '+cur.name+' - '+cur.cerCode;document.getElementById('topActivity').style.display='block';showG();}
 function showG(){
-  let canAdd=(role==='PATRON');let total=cur.guests.reduce((s,g)=>s+g.persons.length,0);let h=`<div class="card"><b>${cur.name}</b> ${cur.cerCode} - ${total} invités<br>`;
-  if(canAdd){h+=`<div style="display:grid;grid-template-columns:1fr 60px 60px;gap:4px"><input id="gn" placeholder="Nom famille"><input id="gp" type="number" value="2"><input id="gt" placeholder="Table"><button type="button" onclick="addG()" class="gold" style="grid-column:span 3">➕ AJOUTER</button></div>`;if(!cur.cerCode&&total>0){h+=`<button type="button" onclick="generateCerCodeNow()" class="green" style="width:100%">✨ GÉNÉRER CODE</button>`;}else if(cur.cerCode){h+=`<button type="button" onclick="exportCer(cers.findIndex(c=>c.id===cur.id))" style="width:100%;background:#FFD700;color:#000">📤 EXPORTER</button>`;}}
+  let isPatron = (role==='PATRON');
+  let canAdd=isPatron;
+  let total=cur.guests.reduce((s,g)=>s+g.persons.length,0);
+  let h=`<div class="card"><b>${cur.name}</b> ${cur.cerCode} - ${total} invités<br>`;
+  if(canAdd){h+=`<div style="display:grid;grid-template-columns:1fr 60px 60px;gap:4px"><input id="gn" placeholder="Nom famille"><input id="gp" type="number" value="2"><input id="gt" placeholder="Table"><button type="button" onclick="addG()" class="gold" style="grid-column:span 3">➕ AJOUTER</button></div>`;if(!cur.cerCode&&total>0){h+=`<button type="button" onclick="generateCerCodeNow()" class="green" style="width:100%">✨ GÉNÉRER CODE</button>`;}else if(cur.cerCode){h+=`<button type="button" onclick="exportCer(cers.findIndex(c=>c.id===cur.id))" style="width:100%;background:#FFD700;color:#000">📤 EXPORTER AVEC ACTIVITÉS</button>`;}}
+  if(isPatron) h+=`<p style="color:#FFD700;font-size:9px;margin-top:6px">👑 PATRON: Clique 👁️ pour voir QR</p>`;
   h+=`</div>`;
-  cur.guests.forEach((f,fi)=>{let v=f.persons.filter(p=>black.includes(p.id)||p.entre).length;h+=`<div class="card"><b>${f.nom} T:${f.table} ${v}/${f.persons.length}</b>${canAdd?`<button type="button" onclick="delF(${fi})" class="red">✕</button>`:``}<div style="display:flex;flex-wrap:wrap;gap:4px">`;f.persons.forEach((p)=>{let isBlack=black.includes(p.id)||p.entre;h+=`<div style="background:${isBlack?'#0a1a0a':'#111'};padding:8px;border-radius:10px;min-width:140px;text-align:center"><b>${p.nom}</b><br>${p.id}<br>${isBlack?'<span style="background:#00ff88;color:#000">✅ '+(p.heure||'')+'</span>':'❌ PAS ENTRÉ'}</div>`;});h+=`</div></div>`;});
+  cur.guests.forEach((f,fi)=>{
+    let v=f.persons.filter(p=>black.includes(p.id)||p.entre).length;
+    h+=`<div class="card"><b>${f.nom} T:${f.table} ${v}/${f.persons.length}</b>${canAdd?`<button type="button" onclick="delF(${fi})" class="red">✕</button>`:``}<div style="display:flex;flex-direction:column;gap:6px;margin-top:8px">`;
+    f.persons.forEach((p)=>{
+      let isBlack=black.includes(p.id)||p.entre;
+      if(isPatron){
+        h+=`<div style="display:flex;align-items:center;justify-content:space-between;background:${isBlack?'#0a1a0a':'#111'};border:1.5px solid #FFD700;padding:10px;border-radius:12px"><div><b style="color:${isBlack?'#00ff88':'#fff'}">${p.nom}</b><br><span style="font-size:8px;color:#666">${isBlack?'✅ '+p.heure:'Pas entré'}</span></div><button type="button" data-qr="${p.id}" data-nom="${p.nom}" class="btn-eye-qr" style="background:#FFD700;color:#000;border:0;padding:8px 12px;border-radius:10px;font-weight:900;cursor:pointer;z-index:99">👁️ VOIR QR</button></div>`;
+      } else {
+        h+=`<div style="display:flex;justify-content:space-between;background:#111;border:1px solid #222;padding:10px;border-radius:12px"><b style="color:#fff">${p.nom}</b><span style="font-size:9px;color:#666">${isBlack?'✅ '+p.heure:'🔒 CACHÉ'}</span></div>`;
+      }
+    });
+    h+=`</div></div>`;
+  });
   document.getElementById('p-cer').innerHTML=h;
+  if(isPatron){
+    document.querySelectorAll('.btn-eye-qr').forEach(btn=>{
+      btn.addEventListener('click', function(){
+        showQRPatron(this.getAttribute('data-qr'), this.getAttribute('data-nom'));
+      });
+    });
+  }
 }
 function addG(){let n=document.getElementById('gn').value.trim();let p=parseInt(document.getElementById('gp').value)||2;let t=document.getElementById('gt').value.trim()||'T1';if(!n)return;let b='GOMA-'+Math.random().toString(36).substr(2,4).toUpperCase();let pers=[];for(let i=1;i<=p;i++)pers.push({id:b+'-'+String(i).padStart(2,'0'),nom:n+' #'+i,table:t,entre:0,heure:''});cur.guests.push({nom:n,codeBase:b,table:t,persons:pers});save();showG();renderCer();}
 function delF(fi){cur.guests.splice(fi,1);save();showG();}
 function generateCerCodeNow(){let code=genCerCode();cur.cerCode=code;cur.version=1;save();showG();renderCer();}
-function exportCer(i){let c=cers[i];let data={cer:c,black:black,hotspot:hotspotMulti[c.id]||{},last:lastEntries,_v611:true};let blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});let url=URL.createObjectURL(blob);let a=document.createElement('a');a.href=url;a.download=`V61.1-AVEC-PHOTO-${c.cerCode}-${c.guests.reduce((s,g)=>s+g.persons.length,0)}inv.json`;a.click();}
+function exportCer(i){
+  let c=cers[i];
+  let idsCer=[];c.guests.forEach(g=>{g.persons.forEach(p=>{idsCer.push(p.id);})});
+  let blackCer=black.filter(id=>idsCer.includes(id));
+  let lastCer=lastEntries.filter(e=>idsCer.includes(e.code));
+  let data={cer:c,black:blackCer,hotspot:hotspotMulti[c.id]||{},last:lastCer,_v611:true,exportedBy:role,exportedAt:new Date().toLocaleString()};
+  let blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});let url=URL.createObjectURL(blob);let a=document.createElement('a');a.href=url;a.download=`V61.1-${c.cerCode}-${c.guests.reduce((s,g)=>s+g.persons.length,0)}inv-${blackCer.length}entres.json`;a.click();
+}
 function delCer(i){if(confirm('Supprimer?')){cers.splice(i,1);save();renderCer();}}
-function showQR(id,nom){lastQRCode=id;document.getElementById('qrText').innerHTML=`${nom}<br>${id}`;document.getElementById('qrcode').innerHTML='';new QRCode(document.getElementById('qrcode'),{text:id,width:180,height:180});document.getElementById('qrModal').style.display='flex';}
+function showQRPatron(id, nom){ lastQRCode=id; document.getElementById('qrName').innerText=nom; document.getElementById('qrText').innerText=id; document.getElementById('qrcode').innerHTML=''; new QRCode(document.getElementById('qrcode'),{text:id,width:200,height:200}); document.getElementById('qrModal').style.display='flex'; }
+function showQR(id,nom){ showQRPatron(id,nom); }
 function shareQR(){if(!lastQRCode)return;window.open('https://wa.me/?text='+encodeURIComponent(lastQRCode),'_blank');}
 function closeQR(){document.getElementById('qrModal').style.display='none';}
-function renderHotspot(){if(!cur){document.getElementById('p-hotspot').innerHTML='<div class="card">Ouvre cérémonie!</div>';return;}if(!hotspotMulti[cur.id])hotspotMulti[cur.id]={};let associes=hotspotMulti[cur.id];let h=`<div class="card"><b>📶 MAÎTRE V61.1 AVEC PHOTO</b></div><div class="card"><b>➕ ASSOCIÉ</b><div style="display:flex;gap:4px"><input id="assocName" placeholder="Nom"><button type="button" onclick="addAssoc()" class="gold">🔑 GÉNÉRER</button></div></div><div class="card"><b>👥 ${Object.keys(associes).length} ASSOCIÉS</b>`;for(let code in associes){let a=associes[code];h+=`<div style="background:#000;border:1px solid ${a.active?'#00ff88':'#ff4444'};padding:8px;margin:4px 0"><b>${a.name}</b> ${code}<br><button type="button" onclick="toggleAssoc('${code}')">${a.active?'BLOQUER':'DÉBLOQUER'}</button> <button type="button" onclick="delAssoc('${code}')" class="red">SUPPR</button></div>`;}h+=`</div>`;document.getElementById('p-hotspot').innerHTML=h;}
+function renderHotspot(){if(!cur){document.getElementById('p-hotspot').innerHTML='<div class="card">Ouvre cérémonie!</div>';return;}if(!hotspotMulti[cur.id])hotspotMulti[cur.id]={};let associes=hotspotMulti[cur.id];let h=`<div class="card"><b>📶 MAÎTRE V61.1 AVEC PHOTO - PARTAGE HOTSPOT</b><p class="small">Cérémonie: ${cur.name} - ${cur.cerCode}</p></div><div class="card"><b>➕ ASSOCIÉ</b><div style="display:flex;gap:4px"><input id="assocName" placeholder="Nom"><button type="button" onclick="addAssoc()" class="gold">🔑 GÉNÉRER</button></div></div><div class="card"><b>👥 ${Object.keys(associes).length} ASSOCIÉS</b>`;for(let code in associes){let a=associes[code];h+=`<div style="background:#000;border:1px solid ${a.active?'#00ff88':'#ff4444'};padding:8px;margin:4px 0;border-radius:10px"><b>${a.name}</b> ${code}<br><div style="display:flex;gap:4px"><button type="button" onclick="toggleAssoc('${code}')">${a.active?'BLOQUER':'DÉBLOQUER'}</button> <button type="button" onclick="delAssoc('${code}')" class="red">SUPPR</button> <button type="button" onclick="navigator.clipboard.writeText('${code}')" style="background:#111;color:#FFD700">📋 COPIER</button></div></div>`;}h+=`</div><div class="card" style="border:2px solid #FFD700"><button type="button" onclick="exportCer(cers.findIndex(c=>c.id===cur.id))" class="gold" style="width:100%;padding:14px">📤 EXPORTER FICHIER AVEC ACTIVITÉS POUR HOTSPOT</button><p class="small" style="color:#00ff88">Ce fichier contient les entrées déjà faites, le hotspot qui importe verra tout</p></div>`;document.getElementById('p-hotspot').innerHTML=h;}
 function addAssoc(){let name=document.getElementById('assocName').value.trim();if(!name)return;if(!cur||!cur.cerCode){alert('Génère code!');return;}if(!hotspotMulti[cur.id])hotspotMulti[cur.id]={};let count=Object.keys(hotspotMulti[cur.id]).length+1;let code=genAssocCode(count);hotspotMulti[cur.id][code]={name:name,active:true};save();renderHotspot();}
 function toggleAssoc(code){hotspotMulti[cur.id][code].active=!hotspotMulti[cur.id][code].active;save();renderHotspot();}
 function delAssoc(code){delete hotspotMulti[cur.id][code];save();renderHotspot();}
@@ -100,21 +154,7 @@ function renderScan(){
   document.getElementById('p-scan').innerHTML=h;
 }
 function setScannerMode(m){stopCam();scannerMode=m;renderScan();}
-function startCam(){
-  if(camRunning) return;
-  let r=document.getElementById('reader'); r.innerHTML='';
-  try{
-    html5QrCode=new Html5Qrcode("reader");
-    html5QrCode.start({facingMode:"environment"},{fps:10,qrbox:{width:250,height:250}},(decodedText)=>{
-      let code=decodedText.trim().toUpperCase();
-      if(code===lastScannedCode) return;
-      lastScannedCode=code;
-      setTimeout(()=>{lastScannedCode="";},1500);
-      document.getElementById('si').value=code;
-      doScanCamera(code);
-    },()=>{}).then(()=>{camRunning=true;}).catch(err=>{r.innerHTML=`❌ ${err}`;});
-  }catch(e){alert('Erreur: '+e.message);}
-}
+function startCam(){if(camRunning) return;let r=document.getElementById('reader'); r.innerHTML='';try{html5QrCode=new Html5Qrcode("reader");html5QrCode.start({facingMode:"environment"},{fps:10,qrbox:{width:250,height:250}},(decodedText)=>{let code=decodedText.trim().toUpperCase();if(code===lastScannedCode) return;lastScannedCode=code;setTimeout(()=>{lastScannedCode="";},1500);document.getElementById('si').value=code;doScanCamera(code);},()=>{}).then(()=>{camRunning=true;}).catch(err=>{r.innerHTML=`❌ ${err}`;});}catch(e){alert('Erreur: '+e.message);}}
 function stopCam(){if(html5QrCode&&camRunning){try{html5QrCode.stop().then(()=>{camRunning=false;}).catch(()=>{camRunning=false;});}catch(e){camRunning=false;}}}
 function findPersonInCur(code){if(!cur) return null;let found=null;cur.guests.forEach(g=>{g.persons.forEach(p=>{if(p.id===code) found=p;});});return found;}
 function findPersonAny(code){let found=null;let foundCer=null;cers.forEach(c=>c.guests.forEach(g=>g.persons.forEach(p=>{if(p.id===code){found=p; foundCer=c;}})));return {person:found, cer:foundCer};}
@@ -127,18 +167,9 @@ function doScanCamera(codeFromCamera){
   let anyRes = findPersonAny(code);
   let personAny = anyRes.person;
   let cerAny = anyRes.cer;
-  if(!personAny){
-    if(r) r.innerHTML=`<div class="jauneBox flash"><span style="font-size:24px">⚠️ QR INCONNU</span><br><span style="font-size:18px;font-weight:900">PAS DE CETTE CÉRÉMONIE!</span><br><br><b style="font-size:14px;background:#000;color:#FFD700;padding:6px 12px;border-radius:8px">${code}</b><br><br><span style="font-size:11px">Ce QR n'est pas de MKA<br>Cérémonie ouverte: ${cur.name}</span></div>`;
-    lastEntries.unshift({code:code,name:'QR INCONNU',time:new Date().toLocaleTimeString()});if(lastEntries.length>20) lastEntries.pop();save();document.getElementById('si').value='';return;
-  }
-  if(!personCur){
-    if(r) r.innerHTML=`<div class="jauneBox flash"><span style="font-size:20px">⚠️ PAS DE CETTE CÉRÉMONIE!</span><br><br><b style="font-size:14px">${personAny.nom}</b><br><span style="font-size:11px">Table: ${personAny.table}</span><br><b style="font-size:12px;background:#000;color:#FFD700;padding:5px 10px;border-radius:8px">${code}</b><br><br><span style="font-size:11px">Tu es de: <b>${cerAny?cerAny.name+' ('+cerAny.cerCode+')':'Autre'}</b><br>Ouverte: <b>${cur.name} (${cur.cerCode})</b><br>Pas de celle-ci!</span></div>`;
-    lastEntries.unshift({code:code,name:personAny.nom,time:new Date().toLocaleTimeString()});if(lastEntries.length>20) lastEntries.pop();save();document.getElementById('si').value='';return;
-  }
-  if(black.includes(code) || personCur.entre){
-    if(r) r.innerHTML=`<div class="dejaBox flash"><span style="font-size:26px">🚫 DÉJÀ ENTRÉ!</span><br><br><b style="font-size:17px">${personCur.nom}</b><br><span style="font-size:13px">Famille: ${personCur.nom.split(' #')[0]} | Table: ${personCur.table}</span><br><b style="font-size:14px;background:#000;color:#fff;padding:6px 12px;border-radius:8px">${code}</b><br><br><span style="font-size:12px">⏰ Entré à: <b>${personCur.heure||'heure inconnue'}</b><br>Nom: ${personCur.nom}<br>Table: ${personCur.table}</span></div>`;
-    lastEntries.unshift({code:code,name:personCur.nom,time:new Date().toLocaleTimeString()});if(lastEntries.length>20) lastEntries.pop();save();document.getElementById('si').value='';if(cur) showG();return;
-  }
+  if(!personAny){if(r) r.innerHTML=`<div class="jauneBox flash"><span style="font-size:24px">⚠️ QR INCONNU</span><br><span style="font-size:18px;font-weight:900">PAS DE CETTE CÉRÉMONIE!</span><br><br><b style="font-size:14px;background:#000;color:#FFD700;padding:6px 12px;border-radius:8px">${code}</b><br><br><span style="font-size:11px">Ce QR n'est pas de MKA<br>Cérémonie ouverte: ${cur.name}</span></div>`;lastEntries.unshift({code:code,name:'QR INCONNU',time:new Date().toLocaleTimeString()});if(lastEntries.length>20) lastEntries.pop();save();document.getElementById('si').value='';return;}
+  if(!personCur){if(r) r.innerHTML=`<div class="jauneBox flash"><span style="font-size:20px">⚠️ PAS DE CETTE CÉRÉMONIE!</span><br><br><b style="font-size:14px">${personAny.nom}</b><br><span style="font-size:11px">Table: ${personAny.table}</span><br><b style="font-size:12px;background:#000;color:#FFD700;padding:5px 10px;border-radius:8px">${code}</b><br><br><span style="font-size:11px">Tu es de: <b>${cerAny?cerAny.name+' ('+cerAny.cerCode+')':'Autre'}</b><br>Ouverte: <b>${cur.name} (${cur.cerCode})</b><br>Pas de celle-ci!</span></div>`;lastEntries.unshift({code:code,name:personAny.nom,time:new Date().toLocaleTimeString()});if(lastEntries.length>20) lastEntries.pop();save();document.getElementById('si').value='';return;}
+  if(black.includes(code) || personCur.entre){if(r) r.innerHTML=`<div class="dejaBox flash"><span style="font-size:26px">🚫 DÉJÀ ENTRÉ!</span><br><br><b style="font-size:17px">${personCur.nom}</b><br><span style="font-size:13px">Famille: ${personCur.nom.split(' #')[0]} | Table: ${personCur.table}</span><br><b style="font-size:14px;background:#000;color:#fff;padding:6px 12px;border-radius:8px">${code}</b><br><br><span style="font-size:12px">⏰ Entré à: <b>${personCur.heure||'heure inconnue'}</b><br>Nom: ${personCur.nom}<br>Table: ${personCur.table}</span></div>`;lastEntries.unshift({code:code,name:personCur.nom,time:new Date().toLocaleTimeString()});if(lastEntries.length>20) lastEntries.pop();save();document.getElementById('si').value='';if(cur) showG();return;}
   personCur.entre=1;personCur.heure=new Date().toLocaleTimeString()+' ['+scannerMode+']';black.push(code);lastEntries.unshift({code:code,name:personCur.nom,time:personCur.heure});if(lastEntries.length>20) lastEntries.pop();save();
   if(r) r.innerHTML=`<div class="valideBox flash"><span style="font-size:28px">✅ VALIDÉ!</span><br><br><b style="font-size:17px">${personCur.nom}</b><br><span style="font-size:13px">Famille: ${personCur.nom.split(' #')[0]} | Table: ${personCur.table}</span><br><b style="font-size:15px;background:#000;color:#00ff88;padding:6px 12px;border-radius:8px">${code}</b><br><br><span style="font-size:11px">⏰ ${personCur.heure}</span></div>`;
   document.getElementById('si').value='';if(cur) showG();
@@ -153,18 +184,9 @@ function doScan(){
   let anyRes = findPersonAny(code);
   let personAny = anyRes.person;
   let cerAny = anyRes.cer;
-  if(!personAny){
-    if(r) r.innerHTML=`<div class="jauneBox flash"><span style="font-size:24px">⚠️ QR INCONNU</span><br><span style="font-size:18px;font-weight:900">PAS DE CETTE CÉRÉMONIE!</span><br><br><b style="font-size:14px;background:#000;color:#FFD700;padding:6px 12px;border-radius:8px">${code}</b><br><span style="font-size:11px">QR non MKA - Ouverte: ${cur.name}</span></div>`;
-    document.getElementById('si').value='';return;
-  }
-  if(!personCur){
-    if(r) r.innerHTML=`<div class="jauneBox flash"><span style="font-size:20px">⚠️ PAS DE CETTE CÉRÉMONIE!</span><br><b>${personAny.nom}</b> Table: ${personAny.table}<br><b style="background:#000;color:#FFD700;padding:5px 10px">${code}</b><br><span style="font-size:11px">Tu es de ${cerAny?cerAny.name:''} mais ouverte ${cur.name}</span></div>`;
-    document.getElementById('si').value='';return;
-  }
-  if(black.includes(code) || personCur.entre){
-    if(r) r.innerHTML=`<div class="dejaBox flash"><span style="font-size:26px">🚫 DÉJÀ ENTRÉ!</span><br><b>${personCur.nom}</b><br>Famille: ${personCur.nom.split(' #')[0]} | Table: ${personCur.table}<br><b style="background:#000;color:#fff;padding:6px 12px">${code}</b><br>⏰ Entré à: ${personCur.heure}<br>Nom: ${personCur.nom}<br>Table: ${personCur.table}</div>`;
-    document.getElementById('si').value='';if(cur) showG();return;
-  }
+  if(!personAny){if(r) r.innerHTML=`<div class="jauneBox flash"><span style="font-size:24px">⚠️ QR INCONNU</span><br><span style="font-size:18px;font-weight:900">PAS DE CETTE CÉRÉMONIE!</span><br><br><b style="font-size:14px;background:#000;color:#FFD700;padding:6px 12px;border-radius:8px">${code}</b><br><span style="font-size:11px">QR non MKA - Ouverte: ${cur.name}</span></div>`;document.getElementById('si').value='';return;}
+  if(!personCur){if(r) r.innerHTML=`<div class="jauneBox flash"><span style="font-size:20px">⚠️ PAS DE CETTE CÉRÉMONIE!</span><br><b>${personAny.nom}</b> Table: ${personAny.table}<br><b style="background:#000;color:#FFD700;padding:5px 10px">${code}</b><br><span style="font-size:11px">Tu es de ${cerAny?cerAny.name:''} mais ouverte ${cur.name}</span></div>`;document.getElementById('si').value='';return;}
+  if(black.includes(code) || personCur.entre){if(r) r.innerHTML=`<div class="dejaBox flash"><span style="font-size:26px">🚫 DÉJÀ ENTRÉ!</span><br><b>${personCur.nom}</b><br>Famille: ${personCur.nom.split(' #')[0]} | Table: ${personCur.table}<br><b style="background:#000;color:#fff;padding:6px 12px">${code}</b><br>⏰ Entré à: ${personCur.heure}<br>Nom: ${personCur.nom}<br>Table: ${personCur.table}</div>`;document.getElementById('si').value='';if(cur) showG();return;}
   personCur.entre=1;personCur.heure=new Date().toLocaleTimeString()+' ['+scannerMode+']';black.push(code);save();
   if(r) r.innerHTML=`<div class="valideBox flash"><span style="font-size:28px">✅ VALIDÉ!</span><br><b>${personCur.nom}</b><br>Famille: ${personCur.nom.split(' #')[0]} | Table: ${personCur.table}<br><b style="background:#000;color:#00ff88;padding:6px 12px">${code}</b><br>⏰ ${personCur.heure}</div>`;document.getElementById('si').value='';if(cur)showG();
 }
@@ -176,14 +198,8 @@ function renderRap(){
   let entres=entresList.length;
   let manquants=total-entres;
   let h=`<div class="card" style="border:3px solid #FFD700"><b>📊 RAPPORT EXACT - ${cur.name} (${cur.cerCode}) - V61.1 AVEC PHOTO</b><br><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px"><div style="background:#0a1a0a;border:2px solid #00ff88;padding:14px;text-align:center"><b style="font-size:28px;color:#00ff88">${entres}</b><br>✅ ENTRÉS VERT</div><div style="background:#2a0a0a;border:2px solid #ff4444;padding:14px;text-align:center"><b style="font-size:28px;color:#ff4444">${manquants}</b><br>❌ MANQUANTS ROUGE</div></div><div style="background:#000;border:1px solid #FFD700;padding:10px;margin-top:8px;text-align:center"><b>Total: ${total} | Entrés: ${entres} | Manquants: ${manquants}</b></div>`;
-  if(entresList.length>0){
-    h+=`<div style="margin-top:12px"><b style="color:#00ff88">✅ DÉJÀ ENTRÉES - ${entres} (Nom + Table + Heure):</b><div style="max-height:400px;overflow-y:auto">`;
-    entresList.sort((a,b)=>(b.heure||'').localeCompare(a.heure||'')).forEach(p=>{
-      h+=`<div style="background:#0a1a0a;border:1px solid #00ff88;padding:8px;margin:4px 0;display:flex;justify-content:space-between"><div><b style="color:#00ff88">${p.nom}</b><br><span style="font-size:9px;color:#FFD700">Famille: ${p.nom.split(' #')[0]} | Table: ${p.table} | ${p.id}</span></div><div style="text-align:right"><span style="background:#00ff88;color:#000;padding:3px 6px;border-radius:6px">⏰ ${p.heure||'--:--'}</span></div></div>`;
-    });
-    h+=`</div></div>`;
-  }
-  h+=`<button type="button" onclick="exportCer(cers.findIndex(c=>c.id===myCerId))" class="gold" style="width:100%;padding:14px;margin-top:12px">📤 EXPORTER V61.1 AVEC PHOTO</button></div>`;
+  if(entresList.length>0){h+=`<div style="margin-top:12px"><b style="color:#00ff88">✅ DÉJÀ ENTRÉES - ${entres} (Nom + Table + Heure):</b><div style="max-height:400px;overflow-y:auto">`;entresList.sort((a,b)=>(b.heure||'').localeCompare(a.heure||'')).forEach(p=>{h+=`<div style="background:#0a1a0a;border:1px solid #00ff88;padding:8px;margin:4px 0;display:flex;justify-content:space-between"><div><b style="color:#00ff88">${p.nom}</b><br><span style="font-size:9px;color:#FFD700">Famille: ${p.nom.split(' #')[0]} | Table: ${p.table} | ${p.id}</span></div><div style="text-align:right"><span style="background:#00ff88;color:#000;padding:3px 6px;border-radius:6px">⏰ ${p.heure||'--:--'}</span></div></div>`;});h+=`</div></div>`;}
+  h+=`<button type="button" onclick="exportCer(cers.findIndex(c=>c.id===myCerId))" class="gold" style="width:100%;padding:14px;margin-top:12px">📤 EXPORTER V61.1 AVEC PHOTO + ACTIVITÉS</button></div>`;
   document.getElementById('p-rapport').innerHTML=h;
 }
 function importUpdate(){
@@ -196,12 +212,24 @@ function importUpdate(){
       let cer=data.cer||data;
       let hs=data.hotspot||{};
       let bl=data.black||[];
+      let last=data.last||[];
       if(!cer.id||!cer.guests) throw new Error('Fichier invalide');
       let idx=cers.findIndex(c=>c.id===cer.id||c.cerCode===cer.cerCode);
-      if(idx>=0){cers[idx]=cer;black=[...new Set([...black,...bl])];}
-      else{cers.push(cer);hotspotMulti[cer.id]=hs;black=[...new Set([...black,...bl])];}
+      if(idx>=0){
+        cers[idx]=cer;
+        black=[...new Set([...black,...bl])];
+        if(!hotspotMulti[cer.id]) hotspotMulti[cer.id]={};
+        hotspotMulti[cer.id]={...hotspotMulti[cer.id],...hs};
+        lastEntries=[...last,...lastEntries].slice(0,50);
+      }else{
+        cers.push(cer);
+        hotspotMulti[cer.id]=hs;
+        black=[...new Set([...black,...bl])];
+        lastEntries=[...last,...lastEntries].slice(0,50);
+      }
       save();renderCer();
-      alert('✅ IMPORTÉ V61.1 AVEC PHOTO! '+cer.name+' ('+cer.cerCode+')');
+      document.getElementById('importResult').innerHTML=`✅ IMPORTÉ: ${cer.name} | ${bl.length} entrées | ${Object.keys(hs).length} associés`;
+      alert(`✅ FICHIER CÉRÉMONIE IMPORTÉ!\n${cer.name} (${cer.cerCode})\nEntrées: ${bl.length}\nAssociés: ${Object.keys(hs).length}\n\nTape maintenant ton code HOTSPOT pour voir les activités.`);
     }catch(err){alert('Erreur: '+err.message);}
   };
   reader.readAsText(file);
