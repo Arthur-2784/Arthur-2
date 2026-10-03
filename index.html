@@ -125,17 +125,6 @@ function showQRPatron(id, nom){
 function closeQR(){
   document.getElementById('qrModal').style.display = 'none';
   }
-
-function showQRPatron(id, nom){
-  document.getElementById('qrName').innerText = nom;
-  document.getElementById('qrText').innerText = id; // le petit numéro
-  document.getElementById('qrcode').innerHTML = '';
-  new QRCode(document.getElementById('qrcode'), {text:id, width:200, height:200});
-  document.getElementById('qrModal').style.display = 'flex';
-}
-function closeQR(){
-  document.getElementById('qrModal').style.display = 'none';
-  }
 function addG(){let n=document.getElementById('gn').value.trim();let p=parseInt(document.getElementById('gp').value)||2;let t=document.getElementById('gt').value.trim()||'T1';if(!n)return;let b='GOMA-'+Math.random().toString(36).substr(2,4).toUpperCase();let pers=[];for(let i=1;i<=p;i++)pers.push({id:b+'-'+String(i).padStart(2,'0'),nom:n+' #'+i,table:t,entre:0,heure:''});cur.guests.push({nom:n,codeBase:b,table:t,persons:pers});save();showG();renderCer();}
 function delF(fi){cur.guests.splice(fi,1);save();showG();}
 function generateCerCodeNow(){let code=genCerCode();cur.cerCode=code;cur.version=1;save();showG();renderCer();}
