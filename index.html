@@ -75,12 +75,45 @@ function renderCer(){
 function createCerBrouillon(){let n=document.getElementById('cn').value.trim();if(!n)return;let id='cer_'+Date.now();let cer={id:id,cerCode:null,version:0,oldCodes:[],name:n,lieu:document.getElementById('cl').value.trim(),adresse:document.getElementById('ca2').value.trim(),date:document.getElementById('cd').value,motPerso:document.getElementById('cm').value.trim(),tel:document.getElementById('ct').value.trim(),guests:[]};cers.push(cer);save();renderCer();}
 function openCer(i){cur=cers[i];myCerId=cur.id;save();document.getElementById('topActivity').innerHTML='✅ V61.1 AVEC PHOTO - '+cur.name+' - '+cur.cerCode;document.getElementById('topActivity').style.display='block';showG();}
 function showG(){
-  let canAdd=(role==='PATRON');let total=cur.guests.reduce((s,g)=>s+g.persons.length,0);let h=`<div class="card"><b>${cur.name}</b> ${cur.cerCode} - ${total} invités<br>`;
-  if(canAdd){h+=`<div style="display:grid;grid-template-columns:1fr 60px 60px;gap:4px"><input id="gn" placeholder="Nom famille"><input id="gp" type="number" value="2"><input id="gt" placeholder="Table"><button type="button" onclick="addG()" class="gold" style="grid-column:span 3">➕ AJOUTER</button></div>`;if(!cur.cerCode&&total>0){h+=`<button type="button" onclick="generateCerCodeNow()" class="green" style="width:100%">✨ GÉNÉRER CODE</button>`;}else if(cur.cerCode){h+=`<button type="button" onclick="exportCer(cers.findIndex(c=>c.id===cur.id))" style="width:100%;background:#FFD700;color:#000">📤 EXPORTER</button>`;}}
+  let canAdd=(role==='PATRON');
+  let isPatron = (role==='PATRON'); // SEULEMENT LUI
+  let total=cur.guests.reduce((s,g)=>s+g.persons.length,0);
+  let h=`<div class="card"><b>${cur.name}</b> ${cur.cerCode} - ${total} invités<br>`;
+  if(canAdd){
+    h+=`<div style="display:grid;grid-template-columns:1fr 60px 60px;gap:4px"><input id="gn" placeholder="Nom famille"><input id="gp" type="number" value="2"><input id="gt" placeholder="Table"><button type="button" onclick="addG()" class="gold" style="grid-column:span 3">➕ AJOUTER</button></div>`;
+    if(!cur.cerCode&&total>0){h+=`<button type="button" onclick="generateCerCodeNow()" class="green" style="width:100%">✨ GÉNÉRER CODE</button>`;}
+    else if(cur.cerCode){h+=`<button type="button" onclick="exportCer(cers.findIndex(c=>c.id===cur.id))" style="width:100%;background:#FFD700;color:#000">📤 EXPORTER</button>`;}
+  }
   h+=`</div>`;
-  cur.guests.forEach((f,fi)=>{let v=f.persons.filter(p=>black.includes(p.id)||p.entre).length;h+=`<div class="card"><b>${f.nom} T:${f.table} ${v}/${f.persons.length}</b>${canAdd?`<button type="button" onclick="delF(${fi})" class="red">✕</button>`:``}<div style="display:flex;flex-wrap:wrap;gap:4px">`;f.persons.forEach((p)=>{let isBlack=black.includes(p.id)||p.entre;h+=`<div style="background:${isBlack?'#0a1a0a':'#111'};padding:8px;border-radius:10px;min-width:140px;text-align:center"><b>${p.nom}</b><br>${p.id}<br>${isBlack?'<span style="background:#00ff88;color:#000">✅ '+(p.heure||'')+'</span>':'❌ PAS ENTRÉ'}</div>`;});h+=`</div></div>`;});
+  if(isPatron) h+=`<p style="padding:8px;color:#FFD700;font-size:10px">👑 PATRON: Clique sur un nom pour voir son QR + Numéro en bas</p>`;
+
+  cur.guests.forEach((f,fi)=>{
+    let v=f.persons.filter(p=>black.includes(p.id)||p.entre).length;
+    h+=`<div class="card"><b>${f.nom} T:${f.table} ${v}/${f.persons.length}</b>${canAdd?`<button type="button" onclick="delF(${fi})" class="red">✕</button>`:``}<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px">`;
+    
+    f.persons.forEach((p)=>{
+      let isBlack=black.includes(p.id)||p.entre;
+      
+      if(isPatron){
+        // PATRON VOIT TOUT ET PEUT CLIQUER
+        h+=`<div onclick="showQR('${p.id}','${p.nom.replace(/'/g,"\\'")}')" style="background:${isBlack?'#0a1a0a':'#111'};border:2px solid #FFD700;padding:10px;border-radius:12px;min-width:150px;text-align:center;cursor:pointer">
+        <b style="color:${isBlack?'#00ff88':'#FFD700'}">${p.nom}</b><br>
+        <span style="font-size:9px;color:#FFD700">👁️ ${p.id}</span><br>
+        ${isBlack?'<span style="background:#00ff88;color:#000;padding:2px 6px;border-radius:6px;font-size:9px">✅ '+p.heure+'</span>':'<span style="font-size:9px;color:#00ff88">👆 CLIQUE QR</span>'}
+        </div>`;
+      } else {
+        // ASSOCIÉ ET CEREMONIE = INVISIBLE TOTAL
+        h+=`<div style="background:#111;border:1px solid #222;padding:10px;border-radius:12px;min-width:130px;text-align:center">
+        <b style="color:#fff">${p.nom}</b><br>
+        <span style="font-size:9px;color:#666">CODE CACHÉ 🔒</span><br>
+        ${isBlack?'<span style="background:#0a1a0a;color:#00ff88;padding:2px 6px;border-radius:6px;font-size:9px">✅ ENTRÉ</span>':'<span style="font-size:9px;color:#666">❌ PAS ENTRÉ</span>'}
+        </div>`;
+      }
+    });
+    h+=`</div></div>`;
+  });
   document.getElementById('p-cer').innerHTML=h;
-}
+  }
 function addG(){let n=document.getElementById('gn').value.trim();let p=parseInt(document.getElementById('gp').value)||2;let t=document.getElementById('gt').value.trim()||'T1';if(!n)return;let b='GOMA-'+Math.random().toString(36).substr(2,4).toUpperCase();let pers=[];for(let i=1;i<=p;i++)pers.push({id:b+'-'+String(i).padStart(2,'0'),nom:n+' #'+i,table:t,entre:0,heure:''});cur.guests.push({nom:n,codeBase:b,table:t,persons:pers});save();showG();renderCer();}
 function delF(fi){cur.guests.splice(fi,1);save();showG();}
 function generateCerCodeNow(){let code=genCerCode();cur.cerCode=code;cur.version=1;save();showG();renderCer();}
